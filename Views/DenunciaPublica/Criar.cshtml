@@ -1,0 +1,20 @@
+﻿@model WorkAcademy.Models.Denuncia
+
+@{
+    ViewData["Title"] = "Denunciar Conteúdo";
+}
+
+<h3>🚨 Denunciar Conteúdo</h3>
+
+<form asp-action="Criar" method="post">
+    <input type="hidden" name="Tipo" value="@ViewBag.Tipo" />
+    <input type="hidden" name="ConteudoId" value="@ViewBag.ConteudoId" />
+
+    <div class="mb-3">
+        <label for="Motivo" class="form-label">Motivo da denúncia:</label>
+        <textarea name="Motivo" class="form-control" rows="4" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Enviar Denúncia</button>
+    <a asp-controller="@ViewBag.Tipo" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

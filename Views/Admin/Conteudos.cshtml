@@ -1,0 +1,115 @@
+﻿@model WorkAcademy.Models.ViewModels.ConteudosViewModel
+@{
+    ViewData["Title"] = "Conteúdos Publicados";
+}
+
+<div class="container mt-4 mb-5">
+    <h2 class="mb-4"><i class="fas fa-tags me-2"></i> Gerenciar Conteúdos Publicados</h2>
+
+    <hr />
+    <h4 class="text-primary"><i class="fas fa-book me-2"></i> Cursos Publicados</h4>
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Título</th>
+                <th>Empresa</th>
+                <th>Categoria</th>
+                <th>Duração</th>
+                <th class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var curso in Model.Cursos)
+            {
+                <tr>
+                    <td>@curso.Nome</td>
+                    <td>@curso.Empresa?.NomeFantasia</td>
+                    <td>@curso.Categoria</td>
+                    <td>@curso.DuracaoMeses meses</td>
+                    <td class="text-center">
+                        <a asp-controller="Cursos" asp-action="Edit" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a asp-controller="Cursos" asp-action="Desativar" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-warning me-1" title="Desativar">
+                            <i class="fas fa-eye-slash"></i>
+                        </a>
+                        <a asp-controller="Cursos" asp-action="Delete" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Deseja excluir este curso?');">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+    <h4 class="text-success"><i class="fas fa-briefcase me-2"></i> Vagas Criadas</h4>
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Cargo</th>
+                <th>Empresa</th>
+                <th>Localização</th>
+                <th>Salário</th>
+                <th class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vaga in Model.Vagas)
+            {
+                <tr>
+                    <td>@vaga.Nome</td>
+                    <td>@vaga.Empresa?.NomeFantasia</td>
+                    <td>@vaga.Localizacao</td>
+                    <td>@vaga.Salario?.ToString("C")</td>
+                    <td class="text-center">
+                        <a asp-controller="Vagas" asp-action="Edit" asp-route-id="@vaga.Id" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a asp-controller="Vagas" asp-action="Desativar" asp-route-id="@vaga.Id" class="btn btn-sm btn-outline-warning me-1" title="Desativar">
+                            <i class="fas fa-eye-slash"></i>
+                        </a>
+                        <a asp-controller="Vagas" asp-action="Delete" asp-route-id="@vaga.Id" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Deseja excluir esta vaga?');">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+    <h4 class="text-primary"><i class="fas fa-book me-2"></i> Cursos Publicados</h4>
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Nome</th> <!-- ✅ AJUSTADO -->
+                <th>Empresa</th>
+                <th>Categoria</th>
+                <th>Duração</th>
+                <th class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var curso in Model.Cursos)
+            {
+                <tr>
+                    <td>@curso.Nome</td> <!-- ✅ AJUSTADO -->
+                    <td>@curso.Empresa?.NomeFantasia</td>
+                    <td>@curso.Categoria</td>
+                    <td>@curso.DuracaoMeses meses</td>
+                    <td class="text-center">
+                        <a asp-controller="Cursos" asp-action="Edit" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a asp-controller="Cursos" asp-action="Desativar" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-warning me-1" title="Desativar">
+                            <i class="fas fa-eye-slash"></i>
+                        </a>
+                        <a asp-controller="Cursos" asp-action="Delete" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Deseja excluir este curso?');">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

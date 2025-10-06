@@ -1,0 +1,173 @@
+﻿@{
+    ViewData["Title"] = "Página Inicial";
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="display-4 fw-bold mb-4">Transforme sua carreira conosco</h1>
+            <p class="lead mb-5">Conectamos você às melhores oportunidades de emprego e cursos de capacitação profissional</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a asp-controller="Vagas" asp-action="Index" class="btn btn-light btn-lg px-4 py-2">Explorar Vagas</a>
+                <a asp-controller="Cursos" asp-action="Index" class="btn btn-outline-light btn-lg px-4 py-2">Ver Cursos</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center section-title">Nossos Serviços</h2>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h3 class="h4">Vagas de Emprego</h3>
+                        <p class="text-muted">Acesso às melhores oportunidades de emprego das empresas parceiras, com filtros avançados para encontrar a vaga perfeita para você.</p>
+                        <a asp-controller="Vagas" asp-action="Index" class="btn btn-outline-primary">Ver Vagas</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="h4">Cursos Profissionais</h3>
+                        <p class="text-muted">Cursos de capacitação e certificação reconhecidos pelo mercado, com opções online e presenciais para todos os níveis.</p>
+                        <a asp-controller="Cursos" asp-action="Index" class="btn btn-outline-primary">Ver Cursos</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-card card shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h3 class="h4">Parcerias Empresariais</h3>
+                        <p class="text-muted">Conectamos empresas a talentos qualificados, oferecendo soluções completas de recrutamento e treinamento.</p>
+                        <a asp-controller="Empresas" asp-action="Index" class="btn btn-outline-primary">Para Empresas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <h2 class="display-4 fw-bold text-primary">1,200+</h2>
+                <p class="text-muted">Vagas disponíveis</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="display-4 fw-bold text-primary">500+</h2>
+                <p class="text-muted">Cursos ofertados</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="display-4 fw-bold text-primary">350+</h2>
+                <p class="text-muted">Empresas parceiras</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="display-4 fw-bold text-primary">10,000+</h2>
+                <p class="text-muted">Profissionais capacitados</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center section-title">Depoimentos</h2>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card testmonial-card h-100">
+                    <div class="card-body">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="fst-italic">"Consegui minha vaga dos sonhos através da WorkAcademy. O processo foi simples e eficiente."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <img src="https://randomuser.me/api/portraits/women/32.jpg" class="rounded-circle me-3" width="50" alt="Depoimento">
+                            <div>
+                                <h6 class="mb-0">Ana Carolina</h6>
+                                <small class="text-muted">Desenvolvedora Front-end</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card testmonial-card h-100">
+                    <div class="card-body">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="fst-italic">"Os cursos me deram as habilidades que precisava para mudar de carreira. Recomendo a todos!"</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <img src="https://randomuser.me/api/portraits/men/45.jpg" class="rounded-circle me-3" width="50" alt="Depoimento">
+                            <div>
+                                <h6 class="mb-0">Ricardo Almeida</h6>
+                                <small class="text-muted">Analista de Dados</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card testmonial-card h-100">
+                    <div class="card-body">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p class="fst-italic">"Como empresa, encontramos ótimos talentos através da plataforma. O processo de recrutamento é excelente."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg" class="rounded-circle me-3" width="50" alt="Depoimento">
+                            <div>
+                                <h6 class="mb-0">Juliana Santos</h6>
+                                <small class="text-muted">RH - TechSolutions</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Pronto para dar o próximo passo na sua carreira?</h2>
+        <p class="lead mb-5">Cadastre-se gratuitamente e tenha acesso a todas as oportunidades</p>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg px-5">Comece Agora</a>
+    </div>
+</section>

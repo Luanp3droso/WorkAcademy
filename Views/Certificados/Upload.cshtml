@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Upload de Certificado";
+}
+
+<h2>Upload de Certificado</h2>
+
+@if (TempData["Mensagem"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Mensagem"]
+    </div>
+}
+
+<form asp-action="Upload" asp-controller="Certificados" enctype="multipart/form-data" method="post">
+    <div class="form-group">
+        <label for="usuarioId">Usuário</label>
+        <select name="usuarioId" class="form-control" required>
+            <option value="">Selecione o usuário</option>
+            @foreach (var usuario in ViewBag.Usuarios as SelectList)
+            {
+                <option value="@usuario.Value">@usuario.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="cursoId">Curso</label>
+        <select name="cursoId" class="form-control" required>
+            <option value="">Selecione o curso</option>
+            @foreach (var curso in ViewBag.Cursos as SelectList)
+            {
+                <option value="@curso.Value">@curso.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="arquivo">Certificado (arquivo PDF ou imagem)</label>
+        <input type="file" name="arquivo" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enviar Certificado</button>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="text-danger mt-3">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}

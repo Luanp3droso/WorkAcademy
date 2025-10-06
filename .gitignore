@@ -1,0 +1,14 @@
+﻿[Bb]in/
+[Oo]bj/
+.vs/
+wwwroot/uploads/
+node_modules/
+*.suo
+*.user
+*.log
+*.db
+*.sqlite*
+*.cache
+*.pdb
+*.dll
+*.exe

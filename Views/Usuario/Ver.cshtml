@@ -1,0 +1,41 @@
+﻿@model WorkAcademy.Models.Usuario
+
+@{
+    ViewData["Title"] = "Perfil de " + Model.NomeCompleto;
+}
+
+<div class="container py-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-4">
+                <img src="@(string.IsNullOrEmpty(Model.FotoPerfil) ? "/img/avatar-default.png" : Model.FotoPerfil)"
+                     class="rounded-circle me-4" width="100" height="100" style="object-fit: cover;" />
+                <div>
+                    <h3 class="mb-0">@Model.NomeCompleto</h3>
+                    <p class="text-muted mb-0">@Model.Email</p>
+                </div>
+            </div>
+
+            <hr />
+
+            <h5 class="fw-semibold mb-3"><i class="bi bi-info-circle-fill me-1"></i> Informações</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>CPF:</strong> @Model.CPF</li>
+                <li class="list-group-item"><strong>Endereço:</strong> @Model.Endereco</li>
+                <li class="list-group-item"><strong>Telefone:</strong> @Model.Telefone</li>
+                <li class="list-group-item"><strong>Celular:</strong> @Model.Celular</li>
+                <li class="list-group-item"><strong>Área de Interesse:</strong> @Model.AreaInteresse</li>
+                <li class="list-group-item"><strong>Data de Cadastro:</strong> @Model.DataCadastro.ToString("dd/MM/yyyy")</li>
+            </ul>
+
+            @if (!string.IsNullOrEmpty(Model.CurriculoPdf))
+            {
+                <div class="mt-4">
+                    <a href="@Model.CurriculoPdf" class="btn btn-outline-secondary" target="_blank">
+                        <i class="bi bi-file-earmark-text me-1"></i> Ver Currículo
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

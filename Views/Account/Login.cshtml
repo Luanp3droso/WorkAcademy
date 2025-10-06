@@ -1,0 +1,112 @@
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="d-flex justify-content-center align-items-center vh-100 white-bg">
+    <div class="login-card p-4 rounded shadow text-dark">
+        <h2 class="text-center mb-4">WorkAcademy</h2>
+
+        <form asp-action="Login" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input name="email" type="email" class="form-control border-dark" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="senha" class="form-label">Senha</label>
+                <input name="senha" type="password" class="form-control border-dark" required />
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary">Entrar</button>
+            </div>
+        </form>
+
+        <div class="text-center text-muted mb-3">ou entre com</div>
+
+        <div class="d-flex justify-content-center gap-3 mb-3">
+            <form asp-action="ExternalLogin" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="provider" value="Google" />
+                <button type="submit" class="btn btn-light border social-icon" title="Google">
+                    <img src="https://www.google.com/images/branding/googleg/2x/googleg_standard_color_18dp.png" alt="Google" />
+                </button>
+            </form>
+
+            <form asp-action="ExternalLogin" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="provider" value="Facebook" />
+                <button type="submit" class="btn btn-light border social-icon" title="Facebook">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook" />
+                </button>
+            </form>
+        </div>
+
+        <div class="text-center mt-2">
+            <a href="/Account/Register" class="text-decoration-none link-primary">Não tem uma conta? Cadastre-se</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #ffffff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .white-bg {
+        background: #ffffff;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        font-weight: bold;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .social-icon {
+        display: inline-flex;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #dee2e6;
+        padding: 0;
+    }
+
+        .social-icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.15);
+        }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+</style>

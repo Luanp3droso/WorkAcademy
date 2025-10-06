@@ -1,0 +1,61 @@
+﻿@model List<WorkAcademy.Models.Denuncia>
+
+@{
+    ViewData["Title"] = "Denúncias";
+}
+
+<h2>Denúncias Recebidas</h2>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success">@TempData["Sucesso"]</div>
+}
+
+<table class="table table-bordered mt-4">
+    <thead class="table-dark">
+        <tr>
+            <th>Tipo</th>
+            <th>ID do Conteúdo</th>
+            <th>Motivo</th>
+            <th>Usuário</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model)
+        {
+            <tr>
+                <td>@d.Tipo</td>
+                <td>@d.ConteudoId</td>
+                <td>@d.Motivo</td>
+                <td>@d.UsuarioId</td>
+                <td>@d.Data.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    @if (d.Resolvido)
+                    {
+                        <span class="text-success">Resolvido</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Pendente</span>
+                    }
+                </td>
+                <td>
+                    @if (!d.Resolvido)
+                    {
+                        <form asp-action="MarcarComoResolvida" method="post">
+                            <input type="hidden" name="id" value="@d.Id" />
+                            <button type="submit" class="btn btn-sm btn-success">Resolver</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhuma ação</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

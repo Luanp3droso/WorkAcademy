@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WorkAcademy</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--dark-color);
+            line-height: 1.6;
+            background-color: var(--light-color);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .hero-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+                opacity: 0.2;
+                z-index: 0;
+            }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+            .feature-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+
+            .btn-primary:hover {
+                background-color: #2980b9;
+                border-color: #2980b9;
+            }
+
+        .btn-outline-primary {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+            .btn-outline-primary:hover {
+                background-color: var(--secondary-color);
+                color: white;
+            }
+
+        .section-title {
+            position: relative;
+            margin-bottom: 3rem;
+            font-weight: 600;
+        }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80px;
+                height: 3px;
+                background: var(--secondary-color);
+            }
+
+        .testimonial-card {
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .contact-section {
+            background-color: #f8f9fa;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    @inject WorkAcademy.Data.ApplicationDbContext _context
+    @using System.Security.Claims
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-graduation-cap me-2"></i>WorkAcademy
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Links principais (à esquerda) -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Vagas" asp-action="Index">Vagas</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Cursos" asp-action="Index">Cursos</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Empresas" asp-action="Index">Empresas</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Contact" asp-action="Index">Contato</a></li>
+                </ul>
+
+                <div class="ms-lg-3 mt-3 mt-lg-0">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        var email = User.FindFirstValue(ClaimTypes.Email);
+                        var usuario = _context.Usuarios.FirstOrDefault(u => u.Email == email);
+                        var foto = usuario?.FotoPerfil ?? "/img/avatar-default.png";
+                        var nome = usuario?.NomeCompleto?.Split(' ')[0] ?? "Conta";
+
+                        <!-- Cluster à direita: sininho + avatar -->
+                        <div class="d-flex align-items-center gap-2">
+                            @await Html.PartialAsync("_NotificationBell")
+
+                            <div class="dropdown">
+                                <a class="btn btn-light dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="@foto" alt="Foto" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;" />
+                                    <span>@nome</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Home">Home</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Perfil">Perfil</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Conexoes">Conexões</a></li>
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item text-primary fw-semibold" asp-area="Admin" asp-controller="Admin" asp-action="Index">
+                                                <i class="fas fa-tools me-1"></i> Painel Admin
+                                            </a>
+                                        </li>
+                                    }
+
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item text-danger">Sair</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center gap-2">
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light me-2">Entrar</a>
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Cadastrar</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h5 class="text-white mb-4"><i class="fas fa-graduation-cap me-2"></i>WorkAcademy</h5>
+                    <p class="text-white-50">Transformando carreiras e negócios através da conexão entre talentos e oportunidades.</p>
+                    <div>
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="text-white mb-4">Links Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a asp-controller="Home" asp-action="Index" class="text-white-50">Home</a></li>
+                        <li><a asp-controller="Vagas" asp-action="Index" class="text-white-50">Vagas</a></li>
+                        <li><a asp-controller="Cursos" asp-action="Index" class="text-white-50">Cursos</a></li>
+                        <li><a asp-controller="Empresas" asp-action="Index" class="text-white-50">Empresas</a></li>
+                        <li><a asp-controller="Contact" asp-action="Index" class="text-white-50">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-white mb-4">Contato</h5>
+                    <ul class="list-unstyled text-white-50">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> Resende, RJ</li>
+                        <li><i class="fas fa-phone me-2"></i> (24) 9999-99999</li>
+                        <li><i class="fas fa-envelope me-2"></i> contato@workacademy.com.br</li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-white mb-4">Newsletter</h5>
+                    <p class="text-white-50">Assine nossa newsletter para receber as melhores oportunidades.</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Seu email">
+                        <button class="btn btn-secondary" type="button">Assinar</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-light">
+            <div class="d-flex justify-content-between text-white-50">
+                <div>&copy; 2025 WorkAcademy. Todos os direitos reservados.</div>
+                <div>
+                    <a href="#" class="text-white-50 me-3">Termos de Uso</a>
+                    <a href="#" class="text-white-50">Política de Privacidade</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

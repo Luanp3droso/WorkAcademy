@@ -1,0 +1,195 @@
+﻿@{
+    ViewData["Title"] = "Home do Usuário";
+    var publicacoes = ViewBag.Publicacoes as List<WorkAcademy.Models.Publicacao>;
+    var outrosUsuarios = ViewBag.OutrosUsuarios as List<WorkAcademy.Models.Usuario>;
+    var pendentes = ViewBag.Pendentes as List<WorkAcademy.Models.Conexao>;
+    var amigos = ViewBag.Amigos as List<WorkAcademy.Models.Usuario>;
+    int usuarioId = ViewBag.UsuarioId;
+    string nome = ViewBag.Nome;
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Bem-vindo(a), @nome!</h2>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Nova Publicação
+                </div>
+                <div class="card-body">
+                    <form asp-action="Publicar" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="usuarioId" value="@usuarioId" />
+                        <textarea name="conteudo" class="form-control mb-2" rows="3" placeholder="Compartilhe algo..."></textarea>
+                        <button type="submit" class="btn btn-primary">Publicar</button>
+                    </form>
+                </div>
+            </div>
+
+            <h4 class="mb-3">Publicações</h4>
+            @if (publicacoes != null && publicacoes.Any())
+            {
+                foreach (var pub in publicacoes)
+                {
+                    var curtidasPublicacao = pub.Curtidas?.Count ?? 0;
+                    bool curtiuPub = pub.Curtidas?.Any(x => x.UsuarioId == usuarioId) ?? false;
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body pb-1">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="@(string.IsNullOrEmpty(pub.Usuario?.FotoPerfil) ? "/img/avatar-default.png" : pub.Usuario.FotoPerfil)"
+                                     class="rounded-circle me-2" width="48" height="48" style="object-fit: cover;" />
+                                <div>
+                                    <h6 class="mb-0">@pub.Usuario?.NomeCompleto</h6>
+                                    <small class="text-muted">@pub.DataCriacao.ToString("dd MMM yyyy ' às ' HH:mm")</small>
+                                </div>
+                                @if (pub.UsuarioId == usuarioId)
+                                {
+                                    <form asp-action="ExcluirPublicacao" method="post" class="ms-auto" onsubmit="return confirm('Deseja realmente excluir esta publicação?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="publicacaoId" value="@pub.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger ms-2">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                            <p class="mb-1">@pub.Conteudo</p>
+                        </div>
+
+                        <div class="card-footer bg-white border-top d-flex justify-content-around pt-2">
+                            <form asp-action="CurtirPublicacao" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="publicacaoId" value="@pub.Id" />
+                                <input type="hidden" name="usuarioId" value="@usuarioId" />
+                                <button type="submit" class="btn btn-light w-100 @(curtiuPub ? "text-primary fw-bold" : "text-secondary")">
+                                    <i class="bi bi-hand-thumbs-up"></i> Curtir (@curtidasPublicacao)
+                                </button>
+                            </form>
+                            <form asp-action="Publicar" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="usuarioId" value="@usuarioId" />
+                                <input type="hidden" name="conteudo" value="[Compartilhado] @pub.Conteudo" />
+                                <button type="submit" class="btn btn-light w-100 text-secondary">
+                                    <i class="bi bi-share"></i> Compartilhar (@curtidasPublicacao)
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="px-4 pb-3">
+                            <form asp-action="Comentar" method="post" class="mt-2">
+                                <input type="hidden" name="publicacaoId" value="@pub.Id" />
+                                <input type="hidden" name="usuarioId" value="@usuarioId" />
+                                <div class="input-group">
+                                    <input name="conteudo" class="form-control form-control-sm" placeholder="Escreva um comentário..." required />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Comentar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info">Nenhuma publicação encontrada.</div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    Sugestões de Conexão
+                </div>
+                <div class="card-body p-2">
+                    @if (outrosUsuarios != null && outrosUsuarios.Any())
+                    {
+                        foreach (var u in outrosUsuarios)
+                        {
+                            <div class="d-flex align-items-center justify-content-between border-bottom py-2">
+                                <div class="d-flex align-items-center">
+                                    <img src="@(string.IsNullOrEmpty(u.FotoPerfil) ? "/img/avatar-default.png" : u.FotoPerfil)"
+                                         class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;" />
+                                    <span>@u.NomeCompleto</span>
+                                </div>
+                                <form asp-action="Conectar" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="usuarioId" value="@usuarioId" />
+                                    <input type="hidden" name="conectadoComId" value="@u.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Adicionar conexão">
+                                        <i class="bi bi-person-plus"></i>
+                                    </button>
+                                </form>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Nenhum usuário sugerido.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark">
+                    Solicitações Pendentes
+                </div>
+                <div class="card-body p-2">
+                    @if (pendentes != null && pendentes.Any())
+                    {
+                        foreach (var p in pendentes)
+                        {
+                            <div class="d-flex align-items-center justify-content-between border-bottom py-2">
+                                <div class="d-flex align-items-center">
+                                    <img src="@(string.IsNullOrEmpty(p.Usuario.FotoPerfil) ? "/img/avatar-default.png" : p.Usuario.FotoPerfil)"
+                                         class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;" />
+                                    <span>@p.Usuario.NomeCompleto</span>
+                                </div>
+                                <form asp-action="Aceitar" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="idConexao" value="@p.Id" />
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="bi bi-check2-circle"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Nenhuma solicitação recebida.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    Minhas Conexões
+                </div>
+                <div class="card-body p-2">
+                    @if (amigos != null && amigos.Any())
+                    {
+                        foreach (var amigo in amigos.Take(5))
+                        {
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="@(string.IsNullOrEmpty(amigo.FotoPerfil) ? "/img/avatar-default.png" : amigo.FotoPerfil)"
+                                     class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;" />
+                                <span>@amigo.NomeCompleto</span>
+                            </div>
+                        }
+                        <a href="/Usuario/Conexoes" class="btn btn-sm btn-outline-secondary w-100 mt-2">Ver todas</a>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Você ainda não possui conexões.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+}

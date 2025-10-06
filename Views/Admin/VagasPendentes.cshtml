@@ -1,0 +1,73 @@
+﻿@model IEnumerable<WorkAcademy.Models.Vaga>
+@{
+    ViewData["Title"] = "Vagas Pendentes";
+}
+
+<h2 class="mb-4">🕓 Vagas Pendentes de Aprovação</h2>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success">@TempData["Sucesso"]</div>
+}
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger">@TempData["Erro"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Nenhuma vaga pendente de aprovação no momento.</div>
+}
+else
+{
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Título</th>
+                <th>Área</th>
+                <th>Empresa</th>
+                <th>Localização</th>
+                <th>Publicado em</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vaga in Model)
+            {
+                <tr>
+                    <td>@vaga.Nome</td>
+                    <td>@vaga.Area</td>
+                    <td>@vaga.Empresa?.NomeFantasia</td>
+                    <td>@vaga.Localizacao</td>
+                    <td>@vaga.DataPublicacao.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <form asp-action="AprovarVaga" asp-route-id="@vaga.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-success btn-sm">✅ Aprovar</button>
+                            @Html.AntiForgeryToken()
+                        </form>
+
+                        <button class="btn btn-danger btn-sm" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#rej-@vaga.Id">
+                            ❌ Rejeitar
+                        </button>
+
+                        <div class="collapse mt-2" id="rej-@vaga.Id">
+                            <form asp-action="RejeitarVaga" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@vaga.Id" />
+                                <div class="mb-2">
+                                    <textarea name="motivo" class="form-control" rows="2"
+                                      placeholder="Informe o motivo (visível para a empresa)"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    Confirmar Rejeição
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}

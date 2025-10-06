@@ -1,0 +1,61 @@
+﻿@model IEnumerable<WorkAcademy.Models.Vaga>
+@{
+    ViewData["Title"] = "Minhas Vagas";
+}
+
+<h2 class="mb-4">Minhas Vagas Cadastradas</h2>
+
+@if ((int?)ViewBag.MinhasPendentes > 0)
+{
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="fas fa-hourglass-half me-2"></i>
+        Você tem <strong class="mx-1">@ViewBag.MinhasPendentes</strong> vaga(s) pendente(s) de aprovação.
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Você ainda não cadastrou nenhuma vaga.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Título</th>
+                <th>Área</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vaga in Model)
+            {
+                <tr>
+                    <td>@vaga.Nome</td>
+                    <td>@vaga.Area</td>
+                    <td>
+                        @if (vaga.Aprovada)
+                        {
+                            <span class="badge bg-success">Aprovada</span>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-column">
+                                <span class="badge bg-warning text-dark mb-1">Pendente</span>
+                                @if (!string.IsNullOrWhiteSpace(vaga.MotivoRejeicao))
+                                {
+                                    <small class="text-danger">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        @vaga.MotivoRejeicao
+                                    </small>
+                                }
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

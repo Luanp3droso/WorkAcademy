@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "Nossos Parceiros";
+}
+
+<div class="container py-5">
+    <!-- Cabeçalho -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">@ViewData["Title"]</h1>
+        <p class="lead">Trabalhamos com as melhores empresas do mercado para oferecer oportunidades exclusivas</p>
+    </div>
+
+    <!-- Seção de Introdução -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <p class="fs-5">
+                Nossa rede de parcerias estratégicas inclui líderes de setores como educação, tecnologia e automotivo.
+                Juntos, criamos soluções personalizadas e programas de benefícios para nossos alunos.
+            </p>
+        </div>
+    </div>
+
+    <!-- Divisão por Setores -->
+    <div class="mb-5">
+        <h2 class="text-center mb-4">Setores de Parceria</h2>
+        <div class="row g-4">
+            <!-- Educação -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+                        <h3>Educação</h3>
+                        <p>Parcerias com instituições de ensino e plataformas educacionais</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automotivo -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-car fa-3x text-danger mb-3"></i>
+                        <h3>Automotivo</h3>
+                        <p>Concessionárias e fabricantes líderes do setor</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Parceiros -->
+    <div class="mb-5">
+        <h2 class="text-center mb-4">Conheça Nossos Parceiros</h2>
+
+        <!-- Educação -->
+        <div class="mb-4">
+            <h3 class="border-bottom pb-2">Educação e Cursos</h3>
+            <div class="row g-4 align-items-center">
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Coursera.com" alt="Coursera">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Udemy.com" alt="Udemy">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Alura.com" alt="Alura">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Firjan.com.br" alt="Firjan">
+                </div>
+            </div>
+        </div>
+
+        <!-- Automotivo -->
+        <div class="mb-4">
+            <h3 class="border-bottom pb-2">Indústria Automotiva</h3>
+            <div class="row g-4 align-items-center">
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Volkswagen.com" alt="Volkswagen">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Ford.com.br" alt="Ford">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Toyota.com" alt="Toyota">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Hyundai.com" alt="Hyundai">
+                </div>
+            </div>
+        </div>
+
+        <!-- Tecnologia -->
+        <div class="mb-4">
+            <h3 class="border-bottom pb-2">Tecnologia</h3>
+            <div class="row g-4 align-items-center">
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/microsoft.com" alt="Microsoft">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/google.com" alt="Google">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/IBM.com" alt="IBM">
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <img src="https://logo.clearbit.com/Oracle.com" alt="Oracle">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA para Parcerias -->
+    <div class="card bg-light border-0 py-4">
+        <div class="card-body text-center">
+            <h2 class="mb-3">Quer se tornar um parceiro?</h2>
+            <p class="mb-4">Junte-se à nossa rede e alcance milhares de profissionais qualificados</p>
+            <a href="/contact" class="btn btn-primary btn-lg px-4">Fale Conosco</a>
+        </div>
+    </div>
+</div>
+
+<!-- Estilo Customizado -->
+<style>
+    .grayscale-hover {
+        filter: grayscale(100%);
+        opacity: 0.7;
+        transition: all 0.3s ease;
+    }
+
+        .grayscale-hover:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+</style>
