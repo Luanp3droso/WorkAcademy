@@ -103,7 +103,7 @@ O WorkAcademy foi desenvolvido como Trabalho de Conclusão de Curso (TCC) do cur
 
 Luan Pedroso
 
-📧 Email - luan3droso@gmail.com
+📧 Email - luanp3droso@gmail.com
 
 🌐 LinkedIn - https://www.linkedin.com/in/luan-pedroso-002517187/
 
