@@ -99,7 +99,7 @@ cd WorkAcademy
 Promover a inclusão social e digital por meio da educação e do trabalho, conectando pessoas, empresas e oportunidades em um único ambiente.
 O WorkAcademy foi desenvolvido como Trabalho de Conclusão de Curso (TCC) do curso de Sistemas de Informação (AEDB).
 
-👨‍💻 Autor
+👨‍💻 Autores
 
 Luan Pedroso
 
@@ -107,7 +107,15 @@ Luan Pedroso
 
 🌐 LinkedIn - https://www.linkedin.com/in/luan-pedroso-002517187/
 
-💻 Desenvolvedor Full Stack & Empreendedor
+💻 Desenvolvedor Full Stack
+
+Lucas Silva
+
+📧 Email - Lucassilva13771@gmail.com
+
+🌐 LinkedIn - https://www.linkedin.com/in/lucas-silva-555169226/
+
+💻 Desenvolvedor Full Stack
 
 🧩 Licença
 
