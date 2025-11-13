@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -217,6 +218,36 @@ namespace WorkAcademy.Controllers
             return RedirectToAction(nameof(VagasPendentes));
         }
         // ====== FIM MODERAÇÃO DE VAGAS ======
+
+
+        // ====== MODERAÇÃO DE CURSOS (APENAS pendentes + aprovar) ======
+        // Considera pendente quando Curso.Ativo == false
+        public async Task<IActionResult> CursosPendentes()
+        {
+            var cursos = await _context.Cursos
+                .Include(c => c.Empresa)
+                .Where(c => !c.Ativo)
+                .OrderByDescending(c => c.Id)
+                .ToListAsync();
+
+            return View(cursos);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AprovarCurso(Guid id)
+        {
+            var curso = await _context.Cursos.FindAsync(id);
+            if (curso == null) return NotFound();
+
+            curso.Ativo = true; // publicado
+            _context.Update(curso);
+            await _context.SaveChangesAsync();
+
+            TempData["Sucesso"] = "Curso aprovado/publicado com sucesso.";
+            return RedirectToAction(nameof(CursosPendentes));
+        }
+        // ====== FIM MODERAÇÃO DE CURSOS ======
     }
 
     public class UsuarioComRolesViewModel

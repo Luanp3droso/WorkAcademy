@@ -2,13 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using WorkAcademy.Data;
 using WorkAcademy.Models;
-using WorkAcademy.Services.Notifications;
 
 namespace WorkAcademy.Controllers
 {
@@ -24,111 +20,55 @@ namespace WorkAcademy.Controllers
 
         // GET: Vagas (público) -> somente aprovadas
         [AllowAnonymous]
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string? searchString)
         {
-            var vagas = _context.Vagas
+            var q = _context.Vagas
+                .AsNoTracking()
                 .Include(v => v.Empresa)
-                .Where(v => v.Aprovada) // Apenas vagas aprovadas
+                .Where(v => v.Aprovada) // apenas aprovadas
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
-                vagas = vagas.Where(v =>
-                    v.Nome.Contains(searchString) ||
-                    v.Descricao.Contains(searchString) ||
-                    v.Empresa.NomeFantasia.Contains(searchString) ||
-                    v.Area.Contains(searchString));
+                var like = $"%{searchString.Trim()}%";
+                q = q.Where(v =>
+                       EF.Functions.Like(v.Nome ?? string.Empty, like)
+                    || EF.Functions.Like(v.Descricao ?? string.Empty, like)
+                    || EF.Functions.Like(v.Area ?? string.Empty, like)
+                    || (v.Empresa != null && EF.Functions.Like(v.Empresa.NomeFantasia ?? string.Empty, like)));
             }
 
-            return View(await vagas.OrderByDescending(v => v.DataPublicacao).ToListAsync());
+            ViewBag.CurrentFilter = searchString;
+            var vagas = await q.OrderByDescending(v => v.DataPublicacao).ToListAsync();
+            return View(vagas);
         }
 
-        // GET: Vagas/Create
         [HttpGet]
-        [Authorize(Roles = "Empresa,Admin")]
-        public async Task<IActionResult> Create()
+        [Authorize(Roles = "Admin,Empresa")]
+        public IActionResult Create()
         {
-            if (User.IsInRole("Admin"))
-            {
-                ViewBag.Empresas = _context.Empresas
-                    .Select(e => new SelectListItem { Value = e.Id.ToString(), Text = e.NomeFantasia })
-                    .ToList();
-                return View("Create");
-            }
-
-            // EMPRESA: exige empresa vinculada ao usuário
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var empresa = await _context.Empresas.FirstOrDefaultAsync(e => e.IdentityUserId == userId);
-
-            if (empresa == null)
-            {
-                TempData["Erro"] = "Você precisa completar o cadastro da sua empresa antes de criar vagas.";
-                return RedirectToAction("Create", "Empresas"); // requer Views/Empresas/Create.cshtml
-            }
-
-            return View("Create");
+            ViewBag.Empresas = new SelectList(_context.Empresas.OrderBy(e => e.NomeFantasia),
+                                              "Id", "NomeFantasia");
+            return View();
         }
 
-        // POST: Vagas/Create
         [HttpPost]
+        [Authorize(Roles = "Admin,Empresa")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Empresa,Admin")]
-        public async Task<IActionResult> Create([Bind("Nome,Descricao,EmpresaId,Area,Salario,Localizacao,TipoContrato,DataExpiracao")] Vaga vaga)
+        public async Task<IActionResult> Create(Vaga model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Empresa? empresa = null;
-
-            if (User.IsInRole("Empresa"))
+            if (!ModelState.IsValid)
             {
-                // Defesa: impede criar vaga sem ter Empresa vinculada
-                empresa = await _context.Empresas.FirstOrDefaultAsync(e => e.IdentityUserId == userId);
-                if (empresa == null)
-                {
-                    TempData["Erro"] = "Você precisa completar o cadastro da sua empresa antes de criar vagas.";
-                    return RedirectToAction("Create", "Empresas");
-                }
-            }
-            else if (User.IsInRole("Admin"))
-            {
-                if (vaga.EmpresaId == Guid.Empty || !_context.Empresas.Any(e => e.Id == vaga.EmpresaId))
-                {
-                    ModelState.AddModelError("EmpresaId", "Selecione uma empresa válida.");
-                }
-                else
-                {
-                    empresa = await _context.Empresas.FirstOrDefaultAsync(e => e.Id == vaga.EmpresaId);
-                }
+                ViewBag.Empresas = new SelectList(_context.Empresas.OrderBy(e => e.NomeFantasia),
+                                                  "Id", "NomeFantasia", model.EmpresaId);
+                return View(model);
             }
 
-            if (ModelState.IsValid && empresa != null)
-            {
-                vaga.Id = Guid.NewGuid();
-                vaga.EmpresaId = empresa.Id;
-                vaga.DataPublicacao = DateTime.Now;
-                vaga.Aprovada = false;          // vai para aprovação
-                // vaga.MotivoRejeicao = null;  // se existir, você pode limpar aqui
-
-                _context.Vagas.Add(vaga);
-                await _context.SaveChangesAsync();
-
-                TempData["Sucesso"] = "Vaga criada com sucesso e enviada para aprovação!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Recarregar dropdown se Admin (em caso de erro de validação)
-            if (User.IsInRole("Admin"))
-            {
-                ViewBag.Empresas = _context.Empresas
-                    .Select(e => new SelectListItem
-                    {
-                        Value = e.Id.ToString(),
-                        Text = e.NomeFantasia
-                    })
-                    .ToList();
-            }
-
-            TempData["Erro"] = "Erro ao criar vaga. Verifique os campos.";
-            return View("Create", vaga);
+            model.DataPublicacao = DateTime.Now;
+            _context.Vagas.Add(model);
+            await _context.SaveChangesAsync();
+            TempData["Sucesso"] = "Vaga publicada!";
+            return RedirectToAction(nameof(Index));
         }
 
         // MINHAS VAGAS (Empresa) + badge de pendentes
@@ -136,12 +76,15 @@ namespace WorkAcademy.Controllers
         public async Task<IActionResult> MinhasVagas()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var empresa = await _context.Empresas.FirstOrDefaultAsync(e => e.IdentityUserId == userId);
+            var empresa = await _context.Empresas
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.IdentityUserId == userId);
 
             if (empresa == null)
                 return Unauthorized();
 
             var vagas = await _context.Vagas
+                .AsNoTracking()
                 .Where(v => v.EmpresaId == empresa.Id)
                 .OrderByDescending(v => v.DataPublicacao)
                 .ToListAsync();
@@ -155,6 +98,7 @@ namespace WorkAcademy.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var vaga = await _context.Vagas
+                .AsNoTracking()
                 .Include(v => v.Empresa)
                 .FirstOrDefaultAsync(v => v.Id == id);
 
@@ -162,13 +106,13 @@ namespace WorkAcademy.Controllers
                 return NotFound();
 
             var outrasVagas = await _context.Vagas
+                .AsNoTracking()
                 .Where(v => v.EmpresaId == vaga.EmpresaId && v.Id != vaga.Id && v.Aprovada)
                 .OrderByDescending(v => v.DataPublicacao)
                 .Take(4)
                 .ToListAsync();
 
             ViewBag.OutrasVagas = outrasVagas;
-
             return View(vaga);
         }
 
@@ -218,9 +162,7 @@ namespace WorkAcademy.Controllers
             }
 
             if (!ModelState.IsValid)
-            {
                 return View(form);
-            }
 
             // Atualiza apenas campos editáveis pela empresa
             vaga.Nome = form.Nome?.Trim();
@@ -233,10 +175,6 @@ namespace WorkAcademy.Controllers
 
             // Mantém para revisão
             vaga.Aprovada = false;
-            // Opcional: resetar motivo quando reenvia
-            // vaga.MotivoRejeicao = null;
-            // Opcional: marcar data de reenvio
-            // vaga.DataPublicacao = DateTime.Now;
 
             _context.Update(vaga);
             await _context.SaveChangesAsync();

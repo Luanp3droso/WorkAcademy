@@ -1,115 +1,207 @@
 ﻿@model WorkAcademy.Models.ViewModels.ConteudosViewModel
 @{
-    ViewData["Title"] = "Conteúdos Publicados";
+    ViewData["Title"] = "Gerenciar Conteúdos";
 }
 
 <div class="container mt-4 mb-5">
-    <h2 class="mb-4"><i class="fas fa-tags me-2"></i> Gerenciar Conteúdos Publicados</h2>
+    <h2 class="mb-4"><i class="fas fa-tags me-2"></i> Gerenciar Conteúdos</h2>
 
-    <hr />
-    <h4 class="text-primary"><i class="fas fa-book me-2"></i> Cursos Publicados</h4>
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Título</th>
-                <th>Empresa</th>
-                <th>Categoria</th>
-                <th>Duração</th>
-                <th class="text-center">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var curso in Model.Cursos)
-            {
-                <tr>
-                    <td>@curso.Nome</td>
-                    <td>@curso.Empresa?.NomeFantasia</td>
-                    <td>@curso.Categoria</td>
-                    <td>@curso.DuracaoMeses meses</td>
-                    <td class="text-center">
-                        <a asp-controller="Cursos" asp-action="Edit" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-primary me-1" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a asp-controller="Cursos" asp-action="Desativar" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-warning me-1" title="Desativar">
-                            <i class="fas fa-eye-slash"></i>
-                        </a>
-                        <a asp-controller="Cursos" asp-action="Delete" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Deseja excluir este curso?');">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3" id="conteudos-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-cursos" data-bs-toggle="tab" data-bs-target="#pane-cursos" type="button" role="tab" aria-controls="pane-cursos" aria-selected="true">
+                Cursos (@(Model.Cursos?.Count ?? 0))
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-vagas" data-bs-toggle="tab" data-bs-target="#pane-vagas" type="button" role="tab" aria-controls="pane-vagas" aria-selected="false">
+                Vagas (@(Model.Vagas?.Count ?? 0))
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-publicacoes" data-bs-toggle="tab" data-bs-target="#pane-publicacoes" type="button" role="tab" aria-controls="pane-publicacoes" aria-selected="false">
+                Publicações (@(Model.Publicacoes?.Count ?? 0))
+            </button>
+        </li>
+    </ul>
 
-    <hr />
-    <h4 class="text-success"><i class="fas fa-briefcase me-2"></i> Vagas Criadas</h4>
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Cargo</th>
-                <th>Empresa</th>
-                <th>Localização</th>
-                <th>Salário</th>
-                <th class="text-center">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var vaga in Model.Vagas)
+    <div class="tab-content" id="conteudos-tabContent">
+        <!-- ============== CURSOS ============== -->
+        <div class="tab-pane fade show active" id="pane-cursos" role="tabpanel" aria-labelledby="tab-cursos">
+            @if (Model.Cursos == null || !Model.Cursos.Any())
             {
-                <tr>
-                    <td>@vaga.Nome</td>
-                    <td>@vaga.Empresa?.NomeFantasia</td>
-                    <td>@vaga.Localizacao</td>
-                    <td>@vaga.Salario?.ToString("C")</td>
-                    <td class="text-center">
-                        <a asp-controller="Vagas" asp-action="Edit" asp-route-id="@vaga.Id" class="btn btn-sm btn-outline-primary me-1" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a asp-controller="Vagas" asp-action="Desativar" asp-route-id="@vaga.Id" class="btn btn-sm btn-outline-warning me-1" title="Desativar">
-                            <i class="fas fa-eye-slash"></i>
-                        </a>
-                        <a asp-controller="Vagas" asp-action="Delete" asp-route-id="@vaga.Id" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Deseja excluir esta vaga?');">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>
+                <div class="alert alert-warning">Nenhum curso cadastrado.</div>
             }
-        </tbody>
-    </table>
+            else
+            {
+                <div class="row g-3">
+                    @foreach (var c in Model.Cursos)
+                    {
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm">
+                                <img class="card-img-top" alt="Capa do curso"
+                                     src="@(string.IsNullOrWhiteSpace(c.ImagemUrl) ? Url.Content("~/img/placeholder.jpg") : Url.Content(c.ImagemUrl))" />
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-truncate" title="@c.Nome">@c.Nome</h5>
 
-    <hr />
-    <h4 class="text-primary"><i class="fas fa-book me-2"></i> Cursos Publicados</h4>
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Nome</th> <!-- ✅ AJUSTADO -->
-                <th>Empresa</th>
-                <th>Categoria</th>
-                <th>Duração</th>
-                <th class="text-center">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var curso in Model.Cursos)
-            {
-                <tr>
-                    <td>@curso.Nome</td> <!-- ✅ AJUSTADO -->
-                    <td>@curso.Empresa?.NomeFantasia</td>
-                    <td>@curso.Categoria</td>
-                    <td>@curso.DuracaoMeses meses</td>
-                    <td class="text-center">
-                        <a asp-controller="Cursos" asp-action="Edit" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-primary me-1" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a asp-controller="Cursos" asp-action="Desativar" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-warning me-1" title="Desativar">
-                            <i class="fas fa-eye-slash"></i>
-                        </a>
-                        <a asp-controller="Cursos" asp-action="Delete" asp-route-id="@curso.Id" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm('Deseja excluir este curso?');">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>
+                                    <p class="card-text small text-muted mb-2">
+                                        @if (c.Empresa != null)
+                                        {
+                                            <span><strong>Empresa:</strong> @c.Empresa.NomeFantasia</span>
+                                            <br />
+         }
+                                        @if (!string.IsNullOrWhiteSpace(c.Categoria))
+                                        {
+                                            <span><strong>Categoria:</strong> @c.Categoria</span>
+                                            <br />
+         }
+                                        @if (!string.IsNullOrWhiteSpace(c.Nivel))
+                                        {
+                                            <span><strong>Nível:</strong> @c.Nivel</span>
+                                            <br />
+         }
+                                        @if (c.DuracaoMeses > 0)
+                                        {
+                                            <span><strong>Duração:</strong> @c.DuracaoMeses mes(es)</span>
+                                        }
+                                    </p>
+
+                                    <div class="mt-auto d-flex align-items-center justify-content-between">
+                                        <span class="badge @(c.Ativo ? "bg-success" : "bg-warning text-dark")">
+                                            @(c.Ativo ? "Publicado" : "Pendente")
+                                        </span>
+
+                                        <div class="btn-group">
+                                            <a class="btn btn-sm btn-outline-primary"
+                                               asp-controller="Cursos" asp-action="Details" asp-route-id="@c.Id">Ver</a>
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               asp-controller="Cursos" asp-action="Edit" asp-route-id="@c.Id">Editar</a>
+
+                                            @if (c.Ativo)
+                                            {
+                                                <form asp-controller="Admin" asp-action="DesativarCurso" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@c.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning"
+                                                            onclick="return confirm('Deseja desativar este curso?');">
+                                                        Desativar
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-controller="Admin" asp-action="AprovarCurso" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@c.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-success">
+                                                        Publicar
+                                                    </button>
+                                                </form>
+                                            }
+
+                                            <a class="btn btn-sm btn-outline-danger"
+                                               asp-controller="Cursos" asp-action="Delete" asp-route-id="@c.Id"
+                                               onclick="return confirm('Deseja remover este curso?');">Remover</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
             }
-        </tbody>
-    </table>
+        </div>
+
+        <!-- ============== VAGAS ============== -->
+        <div class="tab-pane fade" id="pane-vagas" role="tabpanel" aria-labelledby="tab-vagas">
+            @if (Model.Vagas == null || !Model.Vagas.Any())
+            {
+                <div class="alert alert-warning mt-2">Nenhuma vaga cadastrada.</div>
+            }
+            else
+            {
+                <div class="table-responsive mt-2">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Empresa</th>
+                                <th>Área</th>
+                                <th>Local</th>
+                                <th>Status</th>
+                                <th style="width: 220px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var v in Model.Vagas)
+                            {
+                                <tr>
+                                    <td>@v.Nome</td>
+                                    <td>@(v.Empresa?.NomeFantasia ?? "-")</td>
+                                    <td>@v.Area</td>
+                                    <td>@v.Localizacao</td>
+                                    <td>
+                                        @if (v.Aprovada)
+                                        {
+                                            <span class="badge bg-success">Aprovada</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="badge bg-warning text-dark">Pendente</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a class="btn btn-sm btn-outline-primary" asp-controller="Vagas" asp-action="Details" asp-route-id="@v.Id">Ver</a>
+                                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Vagas" asp-action="Edit" asp-route-id="@v.Id">Editar</a>
+                                            <a class="btn btn-sm btn-outline-danger" asp-controller="Vagas" asp-action="Delete" asp-route-id="@v.Id"
+                                               onclick="return confirm('Deseja remover esta vaga?');">Remover</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- ============== PUBLICAÇÕES (sem UserName) ============== -->
+        <div class="tab-pane fade" id="pane-publicacoes" role="tabpanel" aria-labelledby="tab-publicacoes">
+            @if (Model.Publicacoes == null || !Model.Publicacoes.Any())
+            {
+                <div class="alert alert-warning mt-2">Nenhuma publicação encontrada.</div>
+            }
+            else
+            {
+                <div class="list-group mt-2">
+                    @foreach (var p in Model.Publicacoes)
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <!-- Sem Titulo: usa trecho do Conteudo -->
+                                <h6 class="mb-1 text-truncate" title="@p.Conteudo">
+                                    @((p.Conteudo ?? string.Empty).Length > 80
+                                                                ? p.Conteudo.Substring(0, 80) + "..."
+                                                                : p.Conteudo)
+                                                                         </h6>
+                                                                         <div class="btn-group">
+                                                                             <a class="btn btn-sm btn-outline-primary" asp-controller="Usuario" asp-action="DetalhePublicacao" asp-route-id="@p.Id">Ver</a>
+                                                                             <a class="btn btn-sm btn-outline-secondary" asp-controller="Usuario" asp-action="EditarPublicacao" asp-route-id="@p.Id">Editar</a>
+                                                                             <a class="btn btn-sm btn-outline-danger" asp-controller="Usuario" asp-action="ExcluirPublicacao" asp-route-id="@p.Id"
+                                                                                onclick="return confirm('Deseja remover esta publicação?');">Remover</a>
+                                                                         </div>
+                                                                     </div>
+
+                            <p class="mb-1">
+                                @((p.Conteudo ?? string.Empty).Length > 240
+                                                        ? p.Conteudo.Substring(0, 240) + "..."
+                                                        : p.Conteudo)
+                    </p>
+                    @* Se quiser mostrar autor depois, diga-me o nome da propriedade do seu model Usuario (ex.: Nome, NomeUsuario, NomeCompleto) *@
+                </div>
+                                }
+                </div>
+            }
+        </div>
+    </div>
+</div>

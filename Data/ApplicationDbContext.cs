@@ -24,7 +24,7 @@ namespace WorkAcademy.Data
         public DbSet<PublicacaoCurtida> PublicacaoCurtidas { get; set; }
         public DbSet<CursoUsuario> CursosUsuarios { get; set; }
         public DbSet<Denuncia> Denuncias { get; set; }
-        public DbSet<WorkAcademy.Models.Notification> Notifications { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,7 +42,7 @@ namespace WorkAcademy.Data
 
             modelBuilder.Entity<CurtidaComentario>()
                 .HasOne(c => c.Comentario)
-                .WithMany(c => c.Curtidas) // ✅ Correção aqui
+                .WithMany(c => c.Curtidas)
                 .HasForeignKey(c => c.ComentarioId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -109,8 +109,37 @@ namespace WorkAcademy.Data
             modelBuilder.Entity<CursoUsuario>()
                 .HasIndex(cu => new { cu.UsuarioId, cu.CursoId }).IsUnique();
 
-            modelBuilder.Entity<WorkAcademy.Models.Notification>()
-                .HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+            modelBuilder.Entity<Notification>(e =>
+            {
+                e.ToTable("Notifications");        // nome da tabela no SQL
+                e.HasKey(n => n.Id);
+
+                e.Property(n => n.UserId)
+                 .IsRequired();
+
+                e.Property(n => n.Message)
+                 .IsRequired()
+                 .HasMaxLength(500);
+
+                e.Property(n => n.IsRead)
+                 .HasDefaultValue(false);
+
+                e.Property(n => n.IsArchived)
+                 .HasDefaultValue(false);
+
+                e.Property(n => n.CreatedAt)
+                 .HasDefaultValueSql("GETUTCDATE()");
+
+                // Se quiser integridade com AspNetUsers:
+                e.HasOne<IdentityUser>()
+                 .WithMany()
+                 .HasForeignKey(n => n.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                // índice útil para caixa de notificações
+                e.HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+            });
+
         }
     }
 }

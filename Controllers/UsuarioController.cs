@@ -4,6 +4,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using WorkAcademy.Data;
 using WorkAcademy.Models;
+using WorkAcademy.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace WorkAcademy.Controllers
@@ -28,20 +29,17 @@ namespace WorkAcademy.Controllers
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
             if (usuario == null) return RedirectToAction("Login", "Account");
 
-            // Certificados
             var certificados = await _context.Certificados
                 .Include(c => c.Curso)
                 .Where(c => c.UsuarioId == usuario.Id)
                 .ToListAsync();
 
-            // Publicações
             var publicacoes = await _context.Publicacoes
                 .Include(p => p.Usuario)
                 .Where(p => p.UsuarioId == usuario.Id)
                 .OrderByDescending(p => p.DataCriacao)
                 .ToListAsync();
 
-            // Conexões aceitas com includes para evitar erro
             var conexoes = await _context.Conexoes
                 .Include(c => c.Usuario)
                 .Include(c => c.ConectadoCom)
@@ -50,7 +48,6 @@ namespace WorkAcademy.Controllers
                     c.Status == "Aceita")
                 .ToListAsync();
 
-            // Enviar todos os dados necessários para a view
             ViewBag.Nome = usuario.NomeCompleto;
             ViewBag.Email = usuario.Email;
             ViewBag.CPF = usuario.CPF;
@@ -98,7 +95,6 @@ namespace WorkAcademy.Controllers
                 .Distinct()
                 .ToList();
 
-            // Corrigido: pegar pendentes *enviados e recebidos*
             var conexoesPendentes = await _context.Conexoes
                 .Where(c =>
                     (c.UsuarioId == usuario.Id || c.ConectadoComId == usuario.Id) &&
@@ -110,7 +106,6 @@ namespace WorkAcademy.Controllers
                 .Distinct()
                 .ToList();
 
-            // Sugestões = todos os usuários que não estão conectados nem pendentes
             var outrosUsuarios = await _context.Usuarios
                 .Where(u =>
                     u.Id != usuario.Id &&
@@ -227,7 +222,6 @@ namespace WorkAcademy.Controllers
             return _context.Usuarios.FirstOrDefault(u => u.Email == email)?.Id ?? 0;
         }
 
-
         [HttpPost("Publicar")]
         public async Task<IActionResult> Publicar(string conteudo, int usuarioId)
         {
@@ -273,7 +267,6 @@ namespace WorkAcademy.Controllers
 
             return RedirectToAction("Home");
         }
-
 
         [HttpPost("Aceitar")]
         public async Task<IActionResult> Aceitar(int idConexao)
@@ -364,7 +357,8 @@ namespace WorkAcademy.Controllers
             return RedirectToAction("Perfil");
         }
 
-        [HttpGet]
+        // ===================== EDIÇÃO DE PERFIL COM VIEWMODEL =====================
+        [HttpGet("EditarPerfil")]
         public async Task<IActionResult> EditarPerfil()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -375,12 +369,22 @@ namespace WorkAcademy.Controllers
             if (usuario == null)
                 return NotFound();
 
-            return View(usuario);
+            var vm = new UsuarioEditViewModel
+            {
+                Id = usuario.Id,
+                NomeCompleto = usuario.NomeCompleto,
+                Biografia = usuario.Biografia,
+                Endereco = usuario.Endereco,
+                Celular = usuario.Celular,
+                AreaInteresse = usuario.AreaInteresse
+            };
+                
+            return View(vm);
         }
 
-        [HttpPost]
+        [HttpPost("EditarPerfil")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditarPerfil(Usuario model)
+        public async Task<IActionResult> EditarPerfil(UsuarioEditViewModel vm)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var usuario = await _context.Usuarios
@@ -389,21 +393,25 @@ namespace WorkAcademy.Controllers
             if (usuario == null)
                 return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                usuario.NomeCompleto = model.NomeCompleto;
-                usuario.Senha = model.Senha;
-
-                _context.Update(usuario);
-                await _context.SaveChangesAsync();
-
-                TempData["Sucesso"] = "Perfil atualizado com sucesso!";
-                return RedirectToAction("Perfil");
+                TempData["Erro"] = "Verifique os campos informados.";
+                return View(vm);
             }
 
-            TempData["Erro"] = "Erro ao atualizar perfil.";
-            return View(model);
+            usuario.NomeCompleto = vm.NomeCompleto;
+            usuario.Biografia = vm.Biografia;
+            usuario.Endereco = vm.Endereco;
+            usuario.Celular = vm.Celular;
+            usuario.AreaInteresse = vm.AreaInteresse;
+
+            _context.Update(usuario);
+            await _context.SaveChangesAsync();
+
+            TempData["Sucesso"] = "Perfil atualizado com sucesso!";
+            return RedirectToAction("Perfil");
         }
+        // ==========================================================================
 
         [HttpPost("Comentar")]
         [ValidateAntiForgeryToken]
@@ -439,7 +447,6 @@ namespace WorkAcademy.Controllers
             if (usuario == null)
                 return RedirectToAction("Login", "Account");
 
-            // ✅ Todas as conexões aceitas, em qualquer direção
             var conexoes = await _context.Conexoes
                 .Include(c => c.Usuario)
                 .Include(c => c.ConectadoCom)
@@ -448,7 +455,6 @@ namespace WorkAcademy.Controllers
                     c.Status == "Aceita")
                 .ToListAsync();
 
-            // ✅ Determina o "amigo" da conexão (não importa o lado)
             var amigos = conexoes
                 .Select(c => c.UsuarioId == usuario.Id ? c.ConectadoCom : c.Usuario)
                 .ToList();
@@ -491,6 +497,5 @@ namespace WorkAcademy.Controllers
         {
             return View();
         }
-
     }
 }

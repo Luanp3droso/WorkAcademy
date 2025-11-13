@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 using WorkAcademy.Data;
 using WorkAcademy.Models;
 using System.Security.Claims;
-using WorkAcademy.Services.Notifications;   
+using System.IO;
 
 namespace WorkAcademy.Controllers
 {
@@ -18,38 +20,41 @@ namespace WorkAcademy.Controllers
         }
 
         // GET: /Cursos
-        public async Task<IActionResult> Index(string busca, string categoria, string nivel, int? duracaoMin, int? duracaoMax)
+        public async Task<IActionResult> Index(string? busca, string? categoria, string? nivel, int? duracaoMin, int? duracaoMax)
         {
             var cursosQuery = _context.Cursos.AsQueryable();
 
-            if (!string.IsNullOrEmpty(busca))
+            if (!string.IsNullOrWhiteSpace(busca))
             {
+                var like = $"%{busca.Trim()}%";
                 cursosQuery = cursosQuery.Where(c =>
-                    c.Nome.Contains(busca) || c.NomeInstrutor.Contains(busca));
+                    EF.Functions.Like(c.Nome, like) ||
+                    EF.Functions.Like(c.NomeInstrutor, like));
             }
 
-            if (!string.IsNullOrEmpty(categoria))
-            {
+            if (!string.IsNullOrWhiteSpace(categoria))
                 cursosQuery = cursosQuery.Where(c => c.Categoria == categoria);
-            }
 
-            if (!string.IsNullOrEmpty(nivel))
-            {
+            if (!string.IsNullOrWhiteSpace(nivel))
                 cursosQuery = cursosQuery.Where(c => c.Nivel == nivel);
-            }
 
             if (duracaoMin.HasValue)
-            {
                 cursosQuery = cursosQuery.Where(c => c.DuracaoMeses >= duracaoMin);
-            }
 
             if (duracaoMax.HasValue)
-            {
                 cursosQuery = cursosQuery.Where(c => c.DuracaoMeses <= duracaoMax);
-            }
 
-            var categorias = await _context.Cursos.Select(c => c.Categoria).Distinct().ToListAsync();
-            var niveis = await _context.Cursos.Select(c => c.Nivel).Distinct().ToListAsync();
+            var categorias = await _context.Cursos
+                .Select(c => c.Categoria)
+                .Where(c => c != null && c != "")
+                .Distinct()
+                .ToListAsync();
+
+            var niveis = await _context.Cursos
+                .Select(c => c.Nivel)
+                .Where(n => n != null && n != "")
+                .Distinct()
+                .ToListAsync();
 
             ViewBag.Categorias = categorias;
             ViewBag.Niveis = niveis;
@@ -58,14 +63,14 @@ namespace WorkAcademy.Controllers
             return View(cursos);
         }
 
-        // GET: /Cursos/Detalhes/{id}
+        // GET: /Cursos/Details/{id}
         public async Task<IActionResult> Details(Guid id)
         {
             var curso = await _context.Cursos.FirstOrDefaultAsync(c => c.Id == id);
             if (curso == null)
                 return NotFound();
 
-            return View("Details", curso); // Importante: indicar que a View se chama "Details"
+            return View("Details", curso);
         }
 
         [Authorize(Roles = "Admin")]
@@ -121,6 +126,7 @@ namespace WorkAcademy.Controllers
             TempData["Mensagem"] = "Inscrição realizada com sucesso!";
             return RedirectToAction("Index");
         }
+
         // GET: /Cursos/Create
         [HttpGet]
         [Authorize(Roles = "Admin,Empresa")]
@@ -133,19 +139,47 @@ namespace WorkAcademy.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin,Empresa")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Curso curso)
+        public async Task<IActionResult> Create(Curso curso, IFormFile? imagemArquivo)
         {
-            if (ModelState.IsValid)
-            {
-                curso.Id = Guid.NewGuid();
-                _context.Cursos.Add(curso);
-                await _context.SaveChangesAsync();
+            if (!ModelState.IsValid)
+                return View(curso);
 
-                TempData["Mensagem"] = "Curso criado com sucesso!";
-                return RedirectToAction("Index");
+            // Se veio arquivo, salva em wwwroot/img/cursos e define ImagemUrl
+            if (imagemArquivo is not null && imagemArquivo.Length > 0)
+            {
+                // validação simples de mime
+                var contentTypeOk =
+                    imagemArquivo.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
+                if (!contentTypeOk)
+                {
+                    ModelState.AddModelError(nameof(curso.ImagemUrl), "Envie um arquivo de imagem válido.");
+                    return View(curso);
+                }
+
+                var wwwRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                var pasta = Path.Combine(wwwRoot, "img", "cursos");
+                if (!Directory.Exists(pasta))
+                    Directory.CreateDirectory(pasta);
+
+                var nomeArquivo = $"curso_{DateTime.UtcNow.Ticks}{Path.GetExtension(imagemArquivo.FileName)}";
+                var caminho = Path.Combine(pasta, nomeArquivo);
+
+                using (var fs = new FileStream(caminho, FileMode.Create))
+                    await imagemArquivo.CopyToAsync(fs);
+
+                // Define a URL pública
+                curso.ImagemUrl = $"/img/cursos/{nomeArquivo}";
             }
 
-            return View(curso);
+            // Garante um Id
+            if (curso.Id == Guid.Empty)
+                curso.Id = Guid.NewGuid();
+
+            _context.Cursos.Add(curso);
+            await _context.SaveChangesAsync();
+
+            TempData["Mensagem"] = "Curso criado com sucesso!";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

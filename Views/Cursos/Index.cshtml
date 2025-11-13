@@ -1,60 +1,216 @@
 ﻿@model IEnumerable<WorkAcademy.Models.Curso>
 @{
-    ViewData["Title"] = "Cursos";
+    ViewData["Title"] = "Cursos Disponíveis";
     string busca = Context.Request.Query["busca"];
+    bool podeCriar = User?.Identity?.IsAuthenticated == true
+                     && (User.IsInRole("Admin") || User.IsInRole("Empresa"));
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
 
-<div class="container py-4">
-    <h2 class="mb-4">Cursos disponíveis</h2>
+<style>
+    /* --- Hero / Cabeçalho --- */
+    .hero-cursos {
+        background: linear-gradient(180deg, #eef3f8 0%, #f7f9fc 100%);
+        border-radius: 18px;
+        padding: 36px 28px;
+        box-shadow: 0 6px 22px rgba(21, 34, 50, .06);
+    }
 
-    <!-- Barra de busca -->
-    <form method="get" class="input-group mb-4" asp-controller="Cursos" asp-action="Index">
-        <input type="text" name="busca" class="form-control" placeholder="Buscar curso..." value="@busca" />
-        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
-    </form>
+    .hero-title {
+        font-weight: 800;
+        letter-spacing: .2px;
+        color: #2d3e50;
+    }
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        @foreach (var curso in Model)
-        {
-            <div class="col">
-                <div class="card h-100 shadow-sm">
-                    <img src="@curso.ImagemUrl" class="card-img-top" style="height: 180px; object-fit: cover;" />
-                    <div class="card-body">
-                        @if (curso.MaisVendido)
+    /* --- Busca --- */
+    .search-wrap {
+        max-width: 760px;
+        margin: 18px auto 0;
+    }
+
+        .search-wrap .form-control {
+            border-radius: 12px 0 0 12px;
+            height: 56px;
+            padding-left: 18px;
+            border-color: #dbe3ea;
+            box-shadow: none;
+        }
+
+        .search-wrap .btn {
+            border-radius: 0 12px 12px 0;
+            height: 56px;
+            padding: 0 20px;
+            font-weight: 600;
+        }
+
+    /* --- Cards --- */
+    .curso-card {
+        border: 0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 22px rgba(28, 41, 61, .08);
+        transition: transform .18s ease, box-shadow .18s ease;
+        background: #fff;
+    }
+
+        .curso-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 30px rgba(28, 41, 61, .12);
+        }
+
+    .curso-cover {
+        height: 190px;
+        object-fit: cover;
+        background: #f2f5f8;
+    }
+
+    .badge-soft {
+        background: #fff4cc;
+        color: #7a5b00;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .price {
+        font-weight: 800;
+        color: #e63946;
+    }
+
+    .old-price {
+        color: #98a6b3;
+        text-decoration: line-through;
+    }
+
+    .btn-ghost {
+        border: 1px solid #cfe0f0;
+        color: #2b6cb0;
+        font-weight: 600;
+    }
+
+        .btn-ghost:hover {
+            background: #e8f1fb;
+            border-color: #b5d2f0;
+            color: #1e4f86;
+        }
+
+    /* --- Estado vazio --- */
+    .empty-box {
+        background: #e7f6fb;
+        border: 1px solid #c6e6f3;
+        border-radius: 12px;
+        padding: 24px;
+    }
+</style>
+
+<div class="container py-5" style="max-width: 1100px;">
+
+    <!-- Cabeçalho + botão Novo Curso -->
+    <div class="hero-cursos mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <h1 class="hero-title m-0">Cursos Disponíveis</h1>
+
+            @if (podeCriar)
+            {
+                <a asp-controller="Cursos" asp-action="Create" class="btn btn-success px-3 py-2 rounded-3">
+                    <i class="bi bi-plus-lg me-1"></i> Novo Curso
+                </a>
+            }
+        </div>
+
+        <!-- Barra de busca -->
+        <form method="get" asp-controller="Cursos" asp-action="Index" class="search-wrap">
+            <div class="input-group input-group-lg">
+                <input type="text"
+                       name="busca"
+                       class="form-control"
+                       placeholder="Pesquisar por curso, instrutor ou área..."
+                       value="@busca" />
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-search me-1"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <!-- Estado vazio (mesma linguagem visual de Vagas) -->
+        <div class="empty-box text-center">
+            <div class="fw-semibold mb-1">Nenhum curso encontrado</div>
+            <small>Tente ajustar sua busca ou volte mais tarde.</small>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var curso in Model)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card curso-card h-100">
+                        @if (!string.IsNullOrWhiteSpace(curso.ImagemUrl))
                         {
-                            <span class="badge bg-warning text-dark mb-2">Mais vendido</span>
-                        }
-
-                        <h5 class="card-title">@curso.Nome</h5>
-                        <p class="mb-1 text-muted">Instrutor: @curso.NomeInstrutor</p>
-
-                        <div class="mb-2">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <i class="bi @(i <= curso.Avaliacao ? "bi-star-fill text-warning" : "bi-star text-muted")"></i>
-                            }
-                            <small>(@curso.TotalAvaliacoes)</small>
-                        </div>
-
-                        <p class="mb-1">
-                            <span class="fw-bold text-danger">R$ @curso.Valor.ToString("F2")</span>
-                            <span class="text-muted text-decoration-line-through ms-2">R$ @curso.PrecoOriginal.ToString("F2")</span>
-                        </p>
-                    </div>
-                    <div class="card-footer bg-transparent border-0">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <a href="@Url.Action("Details", "Cursos", new { id = curso.Id })" class="btn btn-outline-primary w-100">Inscrever-se</a>
+                            <img src="@curso.ImagemUrl" alt="@curso.Nome" class="curso-cover" />
                         }
                         else
                         {
-                            <a href="@Url.Action("Login", "Usuario")" class="btn btn-outline-primary w-100">Inscrever-se</a>
+                            <img src="/img/cursos/placeholder.jpg" alt="Capa do curso" class="curso-cover" />
                         }
+
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h5 class="card-title mb-0">@curso.Nome</h5>
+                                @if (curso.MaisVendido)
+                                {
+                                    <span class="badge badge-soft px-3 py-2">Mais vendido</span>
+                                }
+                            </div>
+
+                            <p class="text-muted mb-2">Instrutor: @curso.NomeInstrutor</p>
+
+                            <div class="mb-3">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="bi @(i <= curso.Avaliacao ? "bi-star-fill text-warning" : "bi-star text-muted")"></i>
+                                }
+                                <small class="text-muted">(@curso.TotalAvaliacoes)</small>
+                            </div>
+
+                            <div class="d-flex align-items-baseline gap-2">
+                                @if (curso.Valor > 0)
+                                {
+                                    <span class="price">R$ @curso.Valor.ToString("F2")</span>
+                                    @if (curso.PrecoOriginal > curso.Valor)
+                                    {
+                                        <span class="old-price">R$ @curso.PrecoOriginal.ToString("F2")</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success rounded-pill px-3 py-2">Gratuito</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 pt-0 pb-4 px-4">
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <a asp-controller="Cursos" asp-action="Details" asp-route-id="@curso.Id"
+                                   class="btn btn-ghost w-100 rounded-3">
+                                    Ver detalhes / Inscrever-se
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Usuario" asp-action="Login"
+                                   class="btn btn-ghost w-100 rounded-3">
+                                    Entrar para inscrever-se
+                                </a>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
 </div>

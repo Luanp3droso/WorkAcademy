@@ -1,0 +1,67 @@
+﻿@model IEnumerable<WorkAcademy.Models.Curso>
+@{
+    ViewData["Title"] = "Cursos Pendentes";
+}
+
+<h2 class="mb-4">🕓 Cursos Pendentes de Publicação</h2>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success">@TempData["Sucesso"]</div>
+}
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger">@TempData["Erro"]</div>
+}
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">Não há cursos pendentes no momento.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Empresa</th>
+                    <th>Categoria</th>
+                    <th>Nível</th>
+                    <th>Duração</th>
+                    <th style="width: 280px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var curso in Model)
+                {
+                    <tr>
+                        <td>@curso.Nome</td>
+                        <td>@(curso.Empresa?.NomeFantasia ?? "-")</td>
+                        <td>@curso.Categoria</td>
+                        <td>@curso.Nivel</td>
+                        <td>@(curso.DuracaoMeses > 0 ? curso.DuracaoMeses + " mes(es)" : "-")</td>
+                        <td>
+                            <div class="btn-group">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-controller="Cursos" asp-action="Details" asp-route-id="@curso.Id">
+                                    Ver
+                                </a>
+                                <a class="btn btn-sm btn-outline-secondary"
+                                   asp-controller="Cursos" asp-action="Edit" asp-route-id="@curso.Id">
+                                    Editar
+                                </a>
+                                <form asp-action="AprovarCurso" asp-controller="Admin" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@curso.Id" />
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        Aprovar / Publicar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
