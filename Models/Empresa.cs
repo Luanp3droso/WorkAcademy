@@ -21,7 +21,8 @@ namespace WorkAcademy.Models
         public string CNPJ { get; set; }
 
         [Display(Name = "Inscrição Estadual")]
-        public string? InscricaoEstadual { get; set; }
+        [Required(ErrorMessage = "Inscrição Estadual é obrigatória")]
+        public string InscricaoEstadual { get; set; }
 
         [Required(ErrorMessage = "Ramo de atividade é obrigatório")]
         [Display(Name = "Ramo de Atividade")]
@@ -50,7 +51,7 @@ namespace WorkAcademy.Models
         public string? SobreEmpresa { get; set; }
 
         [Display(Name = "Vagas Disponíveis")]
-        public int VagasDisponiveis { get; set; } = 0;
+        public int? VagasDisponiveis { get; set; }
 
         public DateTime DataCadastro { get; set; } = DateTime.Now;
 

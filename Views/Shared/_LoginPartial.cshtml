@@ -1,26 +1,33 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
-
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
-</ul>
+﻿diff --git a/Views/Shared/_LoginPartial.cshtml b/Views/Shared/_LoginPartial.cshtml
+index 921dbe1ebc8b4cbb1b14884d93add26d06964fc7..3d64ddeb72e28083df4162a194e854989613bd5a 100644
+--- a/Views/Shared/_LoginPartial.cshtml
++++ b/Views/Shared/_LoginPartial.cshtml
+@@ -1,26 +1,26 @@
+ ﻿@using Microsoft.AspNetCore.Identity
+ @inject SignInManager<IdentityUser> SignInManager
+ @inject UserManager<IdentityUser> UserManager
+ 
+ <ul class="navbar-nav">
+ @if (SignInManager.IsSignedIn(User))
+ {
+     <li class="nav-item">
+         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+     </li>
+     <li class="nav-item">
+         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+             <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+         </form>
+     </li>
+ }
+ else
+ {
+     <li class="nav-item">
+-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
++        <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Cadastrar</a>
+     </li>
+     <li class="nav-item">
+-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
++        <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+     </li>
+ }
+ </ul>
