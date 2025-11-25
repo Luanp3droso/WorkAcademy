@@ -18,7 +18,8 @@ namespace WorkAcademy.Models
         public string? CNPJ { get; set; }
 
         [Display(Name = "Inscrição Estadual")]
-        public string? InscricaoEstadual { get; set; }
+        [Required(ErrorMessage = "Inscrição Estadual é obrigatória")]
+        public string InscricaoEstadual { get; set; }
 
         [Display(Name = "Ramo de Atividade")]
         public string? RamoAtividade { get; set; }
