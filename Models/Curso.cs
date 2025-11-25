@@ -30,6 +30,7 @@ namespace WorkAcademy.Models
         [Required(ErrorMessage = "O valor do curso é obrigatório.")]
         [Range(0, 10000, ErrorMessage = "Informe um valor entre 0 e 10000.")]
         [Display(Name = "Valor")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Valor { get; set; }
 
         [Required(ErrorMessage = "A duração é obrigatória.")]
@@ -44,7 +45,7 @@ namespace WorkAcademy.Models
         [Required(ErrorMessage = "A URL da imagem é obrigatória.")]
         [Url(ErrorMessage = "Informe uma URL válida.")]
         [Display(Name = "Imagem do Curso (URL)")]
-        public string ImagemUrl { get; set; }
+        public string? ImagemUrl { get; set; }
 
         [Required]
         public Guid EmpresaId { get; set; }
@@ -59,7 +60,7 @@ namespace WorkAcademy.Models
         public string? Url { get; set; }
 
         [Display(Name = "Nome do Instrutor")]
-        public string NomeInstrutor { get; set; }
+        public string? NomeInstrutor { get; set; }
 
         [Range(0, 5)]
         [Display(Name = "Avaliação")]
@@ -68,11 +69,13 @@ namespace WorkAcademy.Models
         [Display(Name = "Total de Avaliações")]
         public int TotalAvaliacoes { get; set; }
 
-        [Display(Name = "Preço Original")]
+        [Display(Name = "Preço")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PrecoOriginal { get; set; }
 
         [Display(Name = "Mais Vendido")]
         public bool MaisVendido { get; set; } = false;
+
         public bool Ativo { get; set; } = true;
     }
 }

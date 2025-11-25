@@ -37,6 +37,11 @@ namespace WorkAcademy.Services
         {
             return await _context.Empresas.FindAsync(id);
         }
+        public async Task<Empresa?> ObterEmpresaPorUsuario(string identityUserId)
+        {
+            return await _context.Empresas
+                .FirstOrDefaultAsync(e => e.IdentityUserId == identityUserId);
+        }
 
         public async Task<IEnumerable<Empresa>> ObterTodasEmpresas()
         {
